@@ -72,7 +72,7 @@ In this Nomad job specification:
    - Set the `VCENTER` environment variable to the vCenter server being processed by this task group.
    - Allocate CPU and memory resources according to your requirements.  I have found that 600MB is required for environments as large as 22,000 VMs.
 
-With this Nomad job specification, you can easily schedule and manage the collection of VM properties from multiple vCenter servers using HashiCorp    -    - Nomad. Adjust the configuration to match your specific environment and requirements
+With this Nomad job specification, you can easily schedule and manage the collection of VM properties from multiple vCenter servers using HashiCorp Nomad. Adjust the configuration to match your specific environment and requirements
 
 ## Contributing
 Feel free to contribute to this project by opening issues or submitting pull requests. Contributions, bug reports, and feature requests are welcome!
