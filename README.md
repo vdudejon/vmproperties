@@ -58,8 +58,21 @@ Before running the script, make sure you have the following prerequisites set up
 ## Database Schema
 The script creates a table named vme_watchman_properties in the PostgreSQL database to store VM data. The table schema matches the data structure of the VM data class used in the script.
 
-## Use with Nomad
-An example nomad file is included to show how to run it in Nomad utilizing vault secrets.
+## Use with Hashicorp Nomad
+You can use HashiCorp Nomad to schedule and run the VMware vSphere VM Properties Collector as a batch job. This allows you to periodically collect VM properties from multiple vCenter servers and store the data in a PostgreSQL database. An example nomad file is included to show how to run it in Nomad utilizing vault secrets.
+
+In this Nomad job specification:
+
+   - `variable "vcenters"` Define an array of vCenter server FQDNs that you want to collect VM properties from.
+   - `job "gather_vmproperties"` Create a Nomad job named "gather_vmproperties" with periodic scheduling.
+   - `dynamic "group"` Dynamically create a task group for each vCenter server specified in the vcenters variable.
+   - `task "vmproperties"` Define a task named "vmproperties" that runs the VMware vSphere VM Properties Collector in a Docker container.
+   - Configure the Docker image you want to use by replacing `<DOCKER IMAGE HERE>`.
+   - Use HashiCorp Vault to retrieve secrets and configure environment variables for connecting to vCenter and the PostgreSQL database.
+   - Set the `VCENTER` environment variable to the vCenter server being processed by this task group.
+   - Allocate CPU and memory resources according to your requirements.  I have found that 600MB is required for environments as large as 22,000 VMs.
+
+With this Nomad job specification, you can easily schedule and manage the collection of VM properties from multiple vCenter servers using HashiCorp    -    - Nomad. Adjust the configuration to match your specific environment and requirements
 
 ## Contributing
 Feel free to contribute to this project by opening issues or submitting pull requests. Contributions, bug reports, and feature requests are welcome!
