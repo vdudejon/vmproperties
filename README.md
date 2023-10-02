@@ -49,8 +49,8 @@ Before running the script, make sure you have the following prerequisites set up
      ```
      OR
      ```bash
-     docker build -t vmproperties .
-     docker run --rm --env-file .env -it vmproperties
+     docker build -t vsphere-vm-properties-collector .
+     docker run --rm --env-file .env -it vsphere-vm-properties-collector
      ```
      
    5. The script will connect to your vCenter server, collect VM properties, and store them in the specified PostgreSQL database
