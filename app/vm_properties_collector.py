@@ -87,7 +87,11 @@ class VMlist():
 def create_vm_obj(virtual_machine: vim.VirtualMachine, cfm:vim.CustomFieldsManager) -> VM:
 
     # Make an easier summary variable, although this ends up not being that useful
-    summary = virtual_machine.summary
+    # Also use this as a check to see if the VM still exists
+    try:
+        summary = virtual_machine.summary
+    except:
+        return
 
     # Check a bunch of device stuff
     hasfloppy, thin_provisioned_count, flat_disk_count, raw_virtual_count, raw_physical_count, scsi_controller_count = get_vm_device_info(virtual_machine)
