@@ -58,6 +58,9 @@ Before running the script, make sure you have the following prerequisites set up
 ## Database Schema
 The script creates a table named vme_watchman_properties in the PostgreSQL database to store VM data. The table schema matches the data structure of the VM data class used in the script.
 
+## Use with Nomad
+An example nomad file is included to show how to run it in Nomad utilizing vault secrets.
+
 ## Contributing
 Feel free to contribute to this project by opening issues or submitting pull requests. Contributions, bug reports, and feature requests are welcome!
 
