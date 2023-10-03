@@ -4,8 +4,7 @@ from dataclasses import dataclass, field, fields
 from typing import List
 from sqlalchemy import create_engine, Column, Integer, String, MetaData, Table, Boolean
 from sqlalchemy.orm import sessionmaker, declarative_base
-from vcenter_functions import connect_vcenter, get_all_vms, get_all_vm_uuids, get_custom_attribute, get_vm_datacenter, get_vm_by_uuid, get_vm_datastore
-import multiprocessing
+from vme_functions import connect_vcenter, get_all_vms, get_all_vm_uuids, get_custom_attribute, get_vm_datacenter, get_vm_by_uuid, get_vm_datastore
 import logging
 import sys
 import urllib.parse
@@ -340,7 +339,7 @@ def process_vm_data(args):
     logging.debug(f"# {vcenter} # Worker {worker_id} disconnected from database")
     timer2 = time.perf_counter()
     batchtime  = timer2 - timer
-    logging.info(f"# {vcenter} # Worker {worker_id} processed {i} VMs in {batchtime:.2f} seconds")
+    logging.debug(f"# {vcenter} # Worker {worker_id} processed {i} VMs in {batchtime:.2f} seconds")
 
     # Disconnect the vCenter session we created.  I don't think atexit worked for these processes
     Disconnect(si)
@@ -457,8 +456,7 @@ def main():
     uuid_len    = len(uuid_list)
     logger.info(f"# {vcenter} # Found {uuid_len} UUIDS")
 
-    # Set the number of processes we will use
-    num_processes = 4
+    
     # Split the UUID list into chunks for each process.
     #chunk_size  = len(uuid_list) // num_processes
     chunk_size  = 50
@@ -466,20 +464,29 @@ def main():
 
 
     logger.info(f"# {vcenter} # Split UUIDS into {len(uuid_chunks)} chunks")
-    
-    
+
+    # Thanks again, ChatGPT.  Creates worker_args as i (a number for a worker id), and a list of uuids
+    worker_args = [(i, uuid_chunk) for i, uuid_chunk in enumerate(uuid_chunks)] 
+
+    '''
+    # Set the number of processes we will use
+    num_processes = 4
     # Create a multiprocessing pool 
     with multiprocessing.Pool(processes=num_processes) as pool:
         # Use the pool to execute the process_vm_data function in parallel 
         # The chunks of UUIDs should be automatically divided among the processes
-        # Thanks again, ChatGPT.  Creates worker_args as i (a number for a worker id), and a list of uuids
-        worker_args = [(i, uuid_chunk) for i, uuid_chunk in enumerate(uuid_chunks)] 
         pool.map(process_vm_data, worker_args)
-
 
     # Close the pool 
     pool.close()
     pool.join()
+    '''
+    
+    # Use concurrent.futures.ProcessPoolExecutor instead of multiprocessing.pool.map
+    # Removed the max workers limit, so the script will use all available processors
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        # Use executor.map to execute tasks in parallel
+        executor.map(process_vm_data, worker_args)
 
     # Delete VMs that no longer exist from database
     logger.debug(f"# {vcenter} # Deleting VMs from database")
